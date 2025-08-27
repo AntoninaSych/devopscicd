@@ -10,7 +10,6 @@ services:
       - ./docker/django:/app
     ports:
       - "8000:8000"
-    # Чекаємо, поки Postgres стане "healthy"
     depends_on:
       db:
         condition: service_healthy
@@ -23,10 +22,8 @@ services:
       - ./docker/.env
     volumes:
       - pg_data:/var/lib/postgresql/data
-    # Щоб не конфліктувати з локальним 5432 — відкриємо на 5433 (за бажанням можна взагалі прибрати ports)
     ports:
       - "5433:5432"
-    # Healthcheck: поки БД не приймає конекшени — сервіс не "healthy"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
@@ -37,7 +34,6 @@ services:
   nginx:
     image: nginx:alpine
     container_name: goit_nginx
-    # Порт 80 на хості вже зайнятий → віддамо nginx на 8080
     ports:
       - "8080:80"
     volumes:

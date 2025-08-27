@@ -3,12 +3,12 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Безпека
+
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-insecure")
 DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "*").split(",")
 
-# 👇 Додано для роботи через nginx (localhost:8080)
+
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8080",
     "http://127.0.0.1:8080",
@@ -24,7 +24,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 ]
 
-# Middleware
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -35,11 +35,11 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# URL / WSGI
+
 ROOT_URLCONF = "goit.urls"
 WSGI_APPLICATION = "goit.wsgi.application"
 
-# Templates
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -56,7 +56,7 @@ TEMPLATES = [
     },
 ]
 
-# PostgreSQL з .env
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -68,13 +68,11 @@ DATABASES = {
     }
 }
 
-# Локалізація
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# Статика
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
