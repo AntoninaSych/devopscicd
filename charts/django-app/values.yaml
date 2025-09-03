@@ -1,17 +1,36 @@
+
 image:
-  repository: 027089197503.dkr.ecr.eu-west-2.amazonaws.com/lesson7-ecr
-  tag: latest
+  repository: "027089197503.dkr.ecr.eu-west-2.amazonaws.com/lesson7-ecr"
+  tag: "latest"
   pullPolicy: IfNotPresent
 
+
 containerPort: 8000
+
 
 service:
   type: LoadBalancer
   port: 80
   targetPort: 8000
 
+
 env:
   DJANGO_SETTINGS_MODULE: "myapp.settings"
+  DJANGO_DEBUG: "false"
+  DJANGO_ALLOWED_HOSTS: "*"
+  # Set real values below:
+  DATABASE_URL: "postgres://user:pass@host:5432/dbname"
+  SECRET_KEY: "please-change-me"
+
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
 
 autoscaling:
   enabled: true
@@ -19,34 +38,6 @@ autoscaling:
   maxReplicas: 6
   targetCPUUtilizationPercentage: 70
 
-ingress:
-  enabled: false
-  className: nginx
-  host: yourdomain.com
-  path: /
-  pathType: Prefix
-  tls: false
-  # clusterIssuer: letsencrypt-prod
-image:
-  repository: 027089197503.dkr.ecr.eu-west-2.amazonaws.com/lesson7-ecr
-  tag: latest
-  pullPolicy: IfNotPresent
-
-containerPort: 8000
-
-service:
-  type: LoadBalancer
-  port: 80
-  targetPort: 8000
-
-env:
-  DJANGO_SETTINGS_MODULE: "myapp.settings"
-
-autoscaling:
-  enabled: true
-  minReplicas: 2
-  maxReplicas: 6
-  targetCPUUtilizationPercentage: 70
 
 ingress:
   enabled: false

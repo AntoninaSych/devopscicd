@@ -2,14 +2,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: django-app
-  {{- $annotations := dict }}
-  {{- if .Values.ingress.tls }}
-    {{- $_ := set $annotations "cert-manager.io/cluster-issuer" (default "letsencrypt-prod" .Values.ingress.clusterIssuer) }}
-  {{- end }}
+  name: {{ .Release.Name }}
   annotations:
-    {{- range $k, $v := $annotations }}
-    {{ $k }}: {{ $v | quote }}
+    {{- if and .Values.ingress.tls .Values.ingress.clusterIssuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer | quote }}
     {{- end }}
 spec:
   {{- if .Values.ingress.className }}
@@ -19,7 +15,7 @@ spec:
   tls:
     - hosts:
         - {{ .Values.ingress.host | quote }}
-      secretName: {{ default "django-app-tls" .Values.ingress.secretName | quote }}
+      secretName: {{ .Release.Name }}-tls
   {{- end }}
   rules:
     - host: {{ .Values.ingress.host | quote }}
@@ -29,7 +25,7 @@ spec:
             pathType: {{ .Values.ingress.pathType }}
             backend:
               service:
-                name: django-app
+                name: {{ .Release.Name }}
                 port:
-                  number: {{ .Values.service.port }}
+                  number: {{ .Values.service.port | default 80 }}
 {{- end }}

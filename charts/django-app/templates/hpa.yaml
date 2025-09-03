@@ -2,7 +2,7 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ .Release.Name }}                              # must match Deployment name
   labels:
     app.kubernetes.io/name: {{ .Chart.Name }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -11,7 +11,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ .Release.Name }}
+    name: {{ .Release.Name }}                            # must match Deployment
   minReplicas: {{ .Values.autoscaling.minReplicas | default 2 }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas | default 6 }}
   metrics:

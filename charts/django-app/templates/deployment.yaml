@@ -21,7 +21,22 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
           ports:
-            - containerPort: {{ .Values.containerPort | default 8000 }}
+            - name: http
+              containerPort: {{ .Values.containerPort | default 8000 }}
           envFrom:
             - configMapRef:
                 name: {{ .Release.Name }}-config
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.containerPort | default 8000 }}
+            initialDelaySeconds: 10    # wait for app startup
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.containerPort | default 8000 }}
+            initialDelaySeconds: 30    # allow migrations/collectstatic
+            periodSeconds: 20
