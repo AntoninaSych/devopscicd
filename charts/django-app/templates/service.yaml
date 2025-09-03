@@ -1,11 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: django-app
+  name: {{ .Release.Name }}
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
-  type: {{ .Values.service.type }}
-  selector:
-    app: django-app
+  type: {{ .Values.service.type | default "LoadBalancer" }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: 8000
+    - port: {{ .Values.service.port | default 80 }}
+      targetPort: {{ .Values.service.targetPort | default (.Values.containerPort | default 8000) }}
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/instance: {{ .Release.Name }}

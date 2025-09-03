@@ -1,36 +1,58 @@
 image:
-  repository: <account>.dkr.ecr.<region>.amazonaws.com/django-app
+  repository: 027089197503.dkr.ecr.eu-west-2.amazonaws.com/lesson7-ecr
   tag: latest
   pullPolicy: IfNotPresent
+
+containerPort: 8000
 
 service:
   type: LoadBalancer
   port: 80
+  targetPort: 8000
 
-resources: {}
+env:
+  DJANGO_SETTINGS_MODULE: "myapp.settings"
+
 autoscaling:
   enabled: true
   minReplicas: 2
   maxReplicas: 6
   targetCPUUtilizationPercentage: 70
 
-config:
-  DJANGO_SECRET_KEY: "changeme"
-  DJANGO_DEBUG: "False"
-  DJANGO_ALLOWED_HOSTS: "*"
-
 ingress:
-  enabled: true
-  # ingress class name for controller (e.g. nginx, alb, traefik)
+  enabled: false
   className: nginx
-  # primary host to route traffic
   host: yourdomain.com
-  # base path to your app
   path: /
   pathType: Prefix
-  # enable TLS with cert-manager
-  tls: true
-  # optional: override cert-manager cluster-issuer (defaults to letsencrypt-prod when tls is true)
-  clusterIssuer: "letsencrypt-prod"
-  # optional: custom secret name for TLS (leave empty to use auto-generated default)
-  secretName: ""
+  tls: false
+  # clusterIssuer: letsencrypt-prod
+image:
+  repository: 027089197503.dkr.ecr.eu-west-2.amazonaws.com/lesson7-ecr
+  tag: latest
+  pullPolicy: IfNotPresent
+
+containerPort: 8000
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 8000
+
+env:
+  DJANGO_SETTINGS_MODULE: "myapp.settings"
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+ingress:
+  enabled: false
+  className: nginx
+  host: yourdomain.com
+  path: /
+  pathType: Prefix
+  tls: false
+  # clusterIssuer: letsencrypt-prod
