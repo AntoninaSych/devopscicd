@@ -1,0 +1,32 @@
+# Terraform state files
+*.tfstate
+*.tfstate.*
+terraform.tfstate
+terraform.tfstate.backup
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform hidden dir
+.terraform/
+.terraform.lock.hcl
+
+# AWS CLI credentials (never commit!)
+.aws/
+config
+credentials
+
+# Python cache (if you use local scripts)
+__pycache__/
+*.pyc
+
+# Local editor/IDE files
+.vscode/
+.idea/
+.DS_Store
+
+# Helm release cache (not necessary, but good to ignore)
+charts/**/charts/
+charts/**/tmp/

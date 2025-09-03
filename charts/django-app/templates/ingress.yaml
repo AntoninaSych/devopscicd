@@ -1,0 +1,35 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: django-app
+  {{- $annotations := dict }}
+  {{- if .Values.ingress.tls }}
+    {{- $_ := set $annotations "cert-manager.io/cluster-issuer" (default "letsencrypt-prod" .Values.ingress.clusterIssuer) }}
+  {{- end }}
+  annotations:
+    {{- range $k, $v := $annotations }}
+    {{ $k }}: {{ $v | quote }}
+    {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if .Values.ingress.tls }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host | quote }}
+      secretName: {{ default "django-app-tls" .Values.ingress.secretName | quote }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          - path: {{ .Values.ingress.path }}
+            pathType: {{ .Values.ingress.pathType }}
+            backend:
+              service:
+                name: django-app
+                port:
+                  number: {{ .Values.service.port }}
+{{- end }}

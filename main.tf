@@ -1,28 +1,41 @@
-provider "aws" {
-  region = "us-west-2"
+terraform {
+  # Allow aws provider 5.x and 6.x
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0, < 7.0"
+    }
+  }
 }
 
-# S3 + DynamoDB backend
+# Pin region to eu-west-2 to keep AZs consistent
+provider "aws" {
+  region = "eu-west-2"
+}
+
 module "s3_backend" {
   source      = "./modules/s3-backend"
-  bucket_name = "lesson-5-terraform-state"
+  bucket_name = "lesson7-tf-state"    # NOTE: bucket name must be globally unique; change if already taken
   table_name  = "terraform-locks"
-  region      = "us-east-1"
 }
 
-# VPC
 module "vpc" {
   source             = "./modules/vpc"
   vpc_cidr_block     = "10.0.0.0/16"
-  public_subnets     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  private_subnets    = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
-  availability_zones = ["us-west-2a", "us-west-2b", "us-west-2c"]
-  vpc_name           = "lesson-5-vpc"
+  vpc_name           = "lesson7-vpc"
+  public_subnets     = ["10.0.1.0/24", "10.0.2.0/24"]
+  private_subnets    = ["10.0.101.0/24", "10.0.102.0/24"]
+  # Use AZs that belong to the selected region (eu-west-2)
+  availability_zones = ["eu-west-2a", "eu-west-2b"]
 }
 
-# ECR
 module "ecr" {
   source       = "./modules/ecr"
-  ecr_name     = "lesson-5-ecr"
+  ecr_name     = "lesson7-ecr"
   scan_on_push = true
+}
+
+module "eks" {
+  source     = "./modules/eks"
+  subnet_ids = module.vpc.private_subnets_ids
 }
