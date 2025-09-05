@@ -1,49 +1,40 @@
-
 image:
-  repository: "027089197503.dkr.ecr.eu-west-2.amazonaws.com/lesson7-ecr"
-  tag: "latest"
+  repository: 519904097991.dkr.ecr.us-east-1.amazonaws.com/ecr-repo-django-app
+  tag: latest
   pullPolicy: IfNotPresent
-
-
-containerPort: 8000
-
+#  pullPolicy: Always
 
 service:
   type: LoadBalancer
-  port: 80
-  targetPort: 8000
-
-
-env:
-  DJANGO_SETTINGS_MODULE: "myapp.settings"
-  DJANGO_DEBUG: "false"
-  DJANGO_ALLOWED_HOSTS: "*"
-  # Set real values below:
-  DATABASE_URL: "postgres://user:pass@host:5432/dbname"
-  SECRET_KEY: "please-change-me"
-
-
-resources:
-  requests:
-    cpu: "100m"
-    memory: "256Mi"
-  limits:
-    cpu: "500m"
-    memory: "512Mi"
-
+  port: 8000
 
 autoscaling:
   enabled: true
   minReplicas: 2
   maxReplicas: 6
-  targetCPUUtilizationPercentage: 70
+  targetCPUUtilization: 70
 
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
 
 ingress:
   enabled: false
-  className: nginx
-  host: yourdomain.com
-  path: /
-  pathType: Prefix
-  tls: false
-  # clusterIssuer: letsencrypt-prod
+#  className: nginx
+#  host: django.example.com
+#  path: /
+#  pathType: Prefix
+#  tls: true
+
+#config:
+#  POSTGRES_PORT: 5432
+#  POSTGRES_HOST: postgres
+#  POSTGRES_USER: django_user
+#  POSTGRES_DB: django_db
+#  POSTGRES_PASSWORD: pass9764gd
+#  ALLOWED_HOSTS: localhost,.us-east-1.elb.amazonaws.com
+

@@ -1,35 +1,40 @@
 variable "region" {
+  description = "AWS region for deployment"
   type        = string
-  description = "AWS region for all resources"
-  default     = "eu-west-2"
+  default     = "us-east-1"
 }
 
-variable "vpc_name" {
+variable "github_username" {
+  description = "GitHub username"
   type        = string
-  description = "Name tag for VPC"
-  default     = "lesson7-vpc"
+  sensitive   = true
 }
 
-variable "vpc_cidr_block" {
+variable "github_token" {
+  description = "GitHub Personal Access Token"
   type        = string
-  description = "VPC CIDR"
-  default     = "10.0.0.0/16"
+  sensitive   = true
 }
 
-variable "availability_zones" {
-  type        = list(string)
-  description = "AZs used for subnets"
-  default     = ["eu-west-2a", "eu-west-2b"]
+variable "github_repo_url" {
+  description = "GitHub repository name"
+  type        = string
 }
 
-variable "public_subnets" {
-  type        = list(string)
-  description = "Public subnets CIDRs"
-  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+variable "instance_type" {
+  description = "EC2 instance type for the worker nodes"
+  type        = string
+  default     = "t2.small"
 }
 
-variable "private_subnets" {
-  type        = list(string)
-  description = "Private subnets CIDRs"
-  default     = ["10.0.101.0/24", "10.0.102.0/24"]
+variable "repository_name" {
+  description = "Name of the ECR repository"
+  type        = string
+  default     = "ecr-repo-django-app"
+}
+
+variable "cluster_name" {
+  description = "Name of the EKS cluster"
+  type        = string
+  default     = "eks-cluster-roman"
 }
