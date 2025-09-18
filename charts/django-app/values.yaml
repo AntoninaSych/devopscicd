@@ -1,12 +1,12 @@
 image:
   repository: 519904097991.dkr.ecr.us-east-1.amazonaws.com/ecr-repo-django-app
   tag: latest
-  pullPolicy: IfNotPresent
-#  pullPolicy: Always
+#  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 service:
   type: LoadBalancer
-  port: 8000
+  port: 80
 
 autoscaling:
   enabled: true
@@ -30,11 +30,23 @@ ingress:
 #  pathType: Prefix
 #  tls: true
 
-#config:
-#  POSTGRES_PORT: 5432
-#  POSTGRES_HOST: postgres
-#  POSTGRES_USER: django_user
-#  POSTGRES_DB: django_db
-#  POSTGRES_PASSWORD: pass9764gd
-#  ALLOWED_HOSTS: localhost,.us-east-1.elb.amazonaws.com
+config:
+  POSTGRES_PORT: 5432
+  POSTGRES_HOST: postgres
+  POSTGRES_USER: django_user
+  POSTGRES_DB: django_db
+  POSTGRES_PASSWORD: pass9764gd
+  ALLOWED_HOSTS: localhost,.us-east-1.elb.amazonaws.com
 
+postgresql:
+  enabled: true
+  global:
+    postgresql:
+      auth:
+        postgresPassword: pass12345
+        username: django_user
+        database: django_db
+        password: pass12345
+  primary:
+    persistence:
+      size: 2Gi

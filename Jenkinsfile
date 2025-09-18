@@ -53,8 +53,10 @@ spec:
           withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: ${github_username}, passwordVariable: ${github_token})]) {
             sh '''
               git clone https://${github_username}:${github_token}@github.com/${github_username}/devops-cicd.git
-              git checkout -b lesson-8-9
-              cd devops-cicd/charts/django-app
+              set -x
+              cd devops-cicd
+              git checkout -b lesson-10
+              cd charts/django-app
 
               sed -i "s/tag: .*/tag: $IMAGE_TAG/" values.yaml
 
@@ -63,7 +65,7 @@ spec:
 
               git add values.yaml
               git commit -m "Update image tag to $IMAGE_TAG"
-              git push origin lesson-8-9
+              git push origin lesson-10
             '''
           }
         }

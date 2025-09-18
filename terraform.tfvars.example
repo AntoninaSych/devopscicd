@@ -1,3 +1,14 @@
-github_token  = <github token>
-github_username  = <github username>
+github_token  = <github_token>
+github_username  = <github_username>
 github_repo_url = "https://github.com/<repo>.git"
+
+rds_password = <rds_password>
+rds_username = <rds_username>
+rds_database_name = <rds_database_name>
+rds_publicly_accessible = true
+
+# true → створюється Aurora Cluster + writer
+# false → створюється одна aws_db_instance
+rds_use_aurora = true
+rds_multi_az = false
+rds_backup_retention_period = "0"

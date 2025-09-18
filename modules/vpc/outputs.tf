@@ -13,12 +13,12 @@ output "vpc_cidr_block" {
   value       = aws_vpc.main.cidr_block
 }
 
-output "public_subnet_ids" {
+output "public_subnets" {
   description = "Список ID публічних підмереж"
   value       = aws_subnet.public[*].id
 }
 
-output "private_subnet_ids" {
+output "private_subnets" {
   description = "Список ID приватних підмереж"
   value       = aws_subnet.private[*].id
 }

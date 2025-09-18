@@ -6,7 +6,7 @@ resource "aws_vpc" "main" {
 
   tags = {
     Name = "${var.vpc_name}-vpc"              # Додаємо тег, який включає ім'я VPC
-    Environment = "lesson-8-9"
+    Environment = "lesson-10"
   }
 }
 
@@ -22,7 +22,7 @@ resource "aws_subnet" "public" {
     Name = "${var.vpc_name}-public-subnet-${count.index + 1}"  # Тег з нумерацією підмережі
     # count.index — це індекс циклу "count", який починається з 0.
     # ${count.index + 1} додає +1 до індексу, щоб отримати людське позначення (1, 2, 3 замість 0, 1, 2).
-    Environment = "lesson-8-9"
+    Environment = "lesson-10"
   }
 }
 
@@ -36,7 +36,7 @@ resource "aws_subnet" "private" {
   tags = {
     Name = "${var.vpc_name}-private-subnet-${count.index + 1}"  # Тег для підмережі з нумерацією
     # ${count.index + 1} використовується, щоб нумерація підмереж починалася з 1.
-    Environment = "lesson-8-9"
+    Environment = "lesson-10"
   }
 }
 
@@ -46,7 +46,7 @@ resource "aws_internet_gateway" "igw" {
 
   tags = {
     Name = "${var.vpc_name}-igw"   # Тег для ідентифікації Internet Gateway
-    Environment = "lesson-8-9"
+    Environment = "lesson-10"
   }
 }
 

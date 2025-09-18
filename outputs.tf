@@ -16,14 +16,14 @@ output "vpc_id" {
   value       = module.vpc.vpc_id
 }
 
-output "public_subnet_ids" {
+output "public_subnets" {
   description = "Public subnets"
-  value       = module.vpc.public_subnet_ids
+  value       = module.vpc.public_subnets
 }
 
-output "private_subnet_ids" {
+output "private_subnets" {
   description = "Private subnets"
-  value       = module.vpc.private_subnet_ids
+  value       = module.vpc.private_subnets
 }
 
 #-------------ECR-----------------
