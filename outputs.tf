@@ -1,78 +1,101 @@
 #-------------Backend-----------------
 
-# output "s3_bucket_name" {
-#   description = "S3 bucket with Terraform state"
-#   value       = module.s3_backend.s3_bucket_name
-# }
+#output "s3_bucket_name" {
+#  description = "Назва S3-бакета для стейтів"
+#  value       = module.s3_backend.s3_bucket_name
+#}
 #
-# output "dynamodb_table_name" {
-#   description = "DynamoDB table with Terraform state lock"
-#   value       = module.s3_backend.dynamodb_table_name
-# }
+#output "s3_bucket_url" {
+#  description = "URL S3-бакета для стейтів"
+#  value       = module.s3_backend.s3_bucket_url
+#}
+#
+#output "dynamodb_table_name" {
+#  description = "Назва таблиці DynamoDB для блокування стейтів"
+#  value       = module.s3_backend.dynamodb_table_name
+#}
 
 #-------------VPC-----------------
+
 output "vpc_id" {
-  description = "VPC ID"
+  description = "ID створеної VPC"
   value       = module.vpc.vpc_id
 }
 
 output "public_subnets" {
-  description = "Public subnets"
+  description = "Список ID публічних підмереж"
   value       = module.vpc.public_subnets
 }
 
 output "private_subnets" {
-  description = "Private subnets"
+  description = "Список ID приватних підмереж"
   value       = module.vpc.private_subnets
 }
 
+output "internet_gateway_id" {
+  description = "ID Internet Gateway"
+  value       = module.vpc.internet_gateway_id
+}
+
+#output "nat_gateway_id" {
+#  description = "ID NAT Gateway"
+#  value       = module.vpc.nat_gateway_id
+#}
+
 #-------------ECR-----------------
+
 output "ecr_repository_url" {
-  description = "ECR repository URL"
+  description = "Повний URL (hostname/імена) для docker push/pull."
   value       = module.ecr.repository_url
 }
 
-#-------------EKS-----------------
-output "eks_cluster_id" {
-  description = "EKS cluster ID"
-  value       = module.eks.cluster_id
+output "ecr_repository_arn" {
+  description = "ARN створеного репозиторію."
+  value       = module.ecr.repository_arn
 }
 
-output "eks_cluster_arn" {
-  description = "EKS cluster ARN"
-  value       = module.eks.cluster_arn
-}
+#-------------EKS-----------------
 
 output "eks_cluster_endpoint" {
-  description = "EKS cluster endpoint"
-  value       = module.eks.cluster_endpoint
+  description = "EKS API endpoint for connecting to the cluster"
+  value       = module.eks.eks_cluster_endpoint
 }
 
 output "eks_cluster_name" {
   description = "Name of the EKS cluster"
-  value       = module.eks.cluster_name
+  value       = module.eks.eks_cluster_name
 }
 
 output "eks_node_role_arn" {
   description = "IAM role ARN for EKS Worker Nodes"
-  value       = module.eks.node_role_arn
+  value       = module.eks.eks_node_role_arn
 }
 
 output "oidc_provider_arn" {
-  value = module.eks.oidc_provider_arn
+  description = "OIDC Provider ARN"
+  value       = module.eks.oidc_provider_arn
 }
 
 output "oidc_provider_url" {
-  value = module.eks.oidc_provider_url
+  description = "OIDC Provider URL"
+  value       = module.eks.oidc_provider_url
 }
 
 #-------------Jenkins-----------------
+
 output "jenkins_release" {
-  value = module.jenkins.jenkins_release_name
+  description = "Jenkins release name"
+  value       = module.jenkins.jenkins_release_name
 }
 
 output "jenkins_namespace" {
-  value = module.jenkins.jenkins_namespace
+  description = "Jenkins namespace"
+  value       = module.jenkins.jenkins_namespace
+}
+
+output "github_user" {
+  description = "GitHub user"
+  value       = var.github_user
 }
 
 #-------------ArgoCD-----------------
@@ -90,4 +113,11 @@ output "argocd_server_service" {
 output "argocd_admin_password" {
   description = "Initial admin password"
   value       = module.argo_cd.admin_password
+}
+
+#-------------RDS-----------------
+
+output "rds_endpoint" {
+  description = "RDS endpoint for connecting to the database"
+  value       = module.rds.rds_endpoint
 }

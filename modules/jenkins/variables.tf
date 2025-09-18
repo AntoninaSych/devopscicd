@@ -1,38 +1,42 @@
-variable "kubeconfig" {
-  description = "Шлях до kubeconfig файлу"
+variable "cluster_name" {
+  description = "Name of the EKS cluster"
   type        = string
 }
 
-variable "cluster_name" {
-  description = "Назва Kubernetes кластера"
+variable "namespace" {
+  description = "Kubernetes namespace for deploying Jenkins"
   type        = string
+  default     = "jenkins"
 }
 
 variable "oidc_provider_arn" {
-  description = "ARN OIDC провайдера для IRSA"
+  description = "OIDC provider ARN from EKS cluster"
   type        = string
 }
 
 variable "oidc_provider_url" {
-  description = "URL OIDC провайдера для IRSA"
-  type        = string
+  type = string
 }
 
-variable "github_username" {
-  description = "GitHub username"
-  type        = string
-  default     = ""
-  sensitive   = true
-}
+// github credentials
 
-variable "github_token" {
+variable "github_pat" {
   description = "GitHub Personal Access Token"
   type        = string
-  default     = ""
   sensitive   = true
+}
+
+variable "github_user" {
+  description = "GitHub username"
+  type        = string
 }
 
 variable "github_repo_url" {
   description = "GitHub repository URL"
+  type        = string
+}
+
+variable "github_branch" {
+  description = "GitHub branch for Jenkins"
   type        = string
 }

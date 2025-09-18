@@ -1,25 +1,49 @@
+variable "bucket_name" {
+  description = "The name of the S3 bucket for Terraform state"
+  type        = string
+  default     = "terraform-state-bucket-orm81zp"
+
+}
+
+variable "table_name" {
+  description = "The name of the DynamoDB table for Terraform locks"
+  type        = string
+  default     = "terraform-locks"
+}
+
+variable "name" {
+  description = "The name of the project"
+  type        = string
+  default     = "django-app"
+}
+
 variable "region" {
   description = "AWS region for deployment"
   type        = string
   default     = "us-east-1"
 }
 
-variable "name" {
-  description = "The name of the project"
+variable "instance_type" {
+  description = "EC2 instance type for the worker nodes"
   type        = string
-  default     = "django-app-roman"
+  default     = "t2.medium"
 }
 
-variable "github_username" {
-  description = "GitHub username"
+variable "repository_name" {
+  description = "Name of the ECR repository"
   type        = string
-  sensitive   = true
+  default     = "ecr-repo-django"
 }
 
-variable "github_token" {
+// github credentials
+variable "github_pat" {
   description = "GitHub Personal Access Token"
   type        = string
-  sensitive   = true
+}
+
+variable "github_user" {
+  description = "GitHub username"
+  type        = string
 }
 
 variable "github_repo_url" {
@@ -27,22 +51,9 @@ variable "github_repo_url" {
   type        = string
 }
 
-variable "instance_type" {
-  description = "EC2 instance type for the worker nodes"
+variable "github_branch" {
+  description = "GitHub branch for Jenkins"
   type        = string
-  default     = "t2.small"
-}
-
-variable "repository_name" {
-  description = "Name of the ECR repository"
-  type        = string
-  default     = "ecr-repo-django-app"
-}
-
-variable "cluster_name" {
-  description = "Name of the EKS cluster"
-  type        = string
-  default     = "eks-cluster-roman"
 }
 
 // RDS
@@ -68,7 +79,7 @@ variable "rds_password" {
 variable "rds_database_name" {
   description = "Name of the RDS database"
   type        = string
-  default     = "app"
+  default     = "myapp"
 
 }
 

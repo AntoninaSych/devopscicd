@@ -1,16 +1,55 @@
-# Домашнє завдання: Створення гнучкого Terraform-модуля для баз даних
+# Фінальний проєкт
 
-## Опис завдання
-Реалізувати універсальний модуль `rds`, який:
+## Технічні вимоги
 
-1. Підіймає Aurora Cluster або звичайну RDS instance на основі значення `use_aurora`;
-2. Автоматично створює:
-   - **DB Subnet Group**
-   - **Security Group**
-   - **Parameter Group** для обраного типу БД
-3. Працює з мінімальними змінами змінних і підтримує багаторазове використання.
-
+- **Інфраструктура**: AWS з використанням Terraform
+- **Компоненти**: VPC, EKS, RDS, ECR, Jenkins, Argo CD, Prometheus, Grafana
 ---
+
+
+## Етапи виконання
+
+1. **Підготовка середовища**:
+
+- Ініціалізувати Terraform.
+- Перевірити всі необхідні змінні та параметри.
+
+
+2. **Розгортання інфраструктури**:
+
+- Виконати команду розгортання:
+```
+terraform apply
+```
+
+- Перевірити стан ресурсів через:
+```
+kubectl get all -n jenkins
+kubectl get all -n argocd
+kubectl get all -n monitoring
+```
+
+3. **Перевірка доступності**:
+
+- Jenkins:
+```
+kubectl port-forward svc/jenkins 8080:8080 -n jenkins
+```
+
+- Argo CD:
+```
+kubectl port-forward svc/argocd-server 8081:443 -n argocd
+```
+
+4. **Моніторинг та перевірка метрик**:
+
+- Grafana:
+```
+kubectl port-forward svc/grafana 3000:80 -n monitoring
+```
+
+- Перевірити стан метрик в Grafana Dashboard.
+
 
 ## Структура проєкту
 
@@ -79,26 +118,31 @@
 │       ├── Chart.yaml             # Метадані чарта
 │       └── values.yaml            # Конфігураційні значення (ConfigMap зі змінними середовища)
 │ 
+├──django
+│ 	├── goit\
+│ 	├── Dockerfile
+│ 	├── Jenkinsfile
+│ 	└── docker-compose.yaml
+│ 
 └── README.md                # Документація проєкту
 ```
 
-## Функціонал модуля:
+## Необхідні умови
+- `AWS CLI` встановлено та налаштовано
+- `kubectl` встановлено
+- `Helm` встановлено
+- `Docker` встановлено
+- `Terraform` встановлено
 
-- `use_aurora` = `true` → створюється Aurora Cluster + writer;
-- `use_aurora` = `false` → створюється одна `aws_db_instance`;
-- В обох випадках:
-  - створюється `aws_db_subnet_group`;
-  - створюється `aws_security_group`;
-  - створюється `parameter group` з базовими параметрами (`max_connections`, `log_statement`, `work_mem`);
-  - Параметри `engine`, `engine_version`, `instance_class`, `multi_az` задаються через змінні.
 
 ## Налаштування змінних
 У корні проєкту створіть файл `terraform.tfvars` з наступними змінними:
 
 ```
-github_token  = <github_token>
-github_username  = <github_username>
+github_pat  = <github token>
+github_user  = <github username>
 github_repo_url = "https://github.com/<repo>.git"
+github_branch = "main"
 
 rds_password = <rds_password>
 rds_username = <rds_username>
@@ -108,7 +152,6 @@ rds_publicly_accessible = true
 # true → створюється Aurora Cluster + writer
 # false → створюється одна aws_db_instance
 rds_use_aurora = true
-
 rds_multi_az = false
 rds_backup_retention_period = "0"
 ```
@@ -137,31 +180,30 @@ kubectl get nodes
 kubectl get svc -A
 ```
 ![bash](./assets/bash.png)
+
+Відкрийте Jenkins LoadBalancer URL (username: admin; password: admin123)
+- запустіть `seed-job` задачу (це створить нову задачу `django-docker`)
+- запустіть `django-docker` задачу:
+  - Збере та завантажить образ Docker до ECR
+  - Об'єднає MR у вашому репозиторії з оновленням версії програми (відповідно до номера збірки завдання Jenkins `django-docker`)
+
 ![jenkins](./assets/jenkins.png)
+
+Відкрити Argo CD LoadBalancer URL,
+ Використовуйте логін admin, а щоб отримати пароль виконайте наступну команду `kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath={.data.password} | base64 -d`
+- перевірити статус `example-app` застосунку (має бути `Healthy` та `Synced`)
+
+![argocd](./assets/argocd.png)
+
+## Моніторинг
+- перенаправити порт Grafana за допомогою наступної команди `kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:80`
+- відкрити http://localhost:3000
+- ввести імʼя користувача `admin` та пароль, використавши наступну команду `kubectl get secret --namespace monitoring kube-prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 --decode`
+- перевірте панелі інструментів, щоб побачити використання процесора та пам'яті (POD, вузли тощо)
+
+![grafana](./assets/grafana.png)
 
 ## Видалення ресурсів
 ```bash
 terraform destroy
 ```
-
-## Налаштування віддаленого бекенду
-
-Після початкового розгортання для активації віддаленого бекенду:
-
-1. Розкоментуйте блок конфігурації бекенду в `backend.tf`.
-
-2. Виконайте команду `terraform init` з параметром для повторного підключення бекенду:
-
-```bash
-terraform init -reconfigure
-```
-
-## Відновлення
-1. Закоментуйте конфігурацію бекенду в `backend.tf`.
-2. Виконайте `terraform init`.
-3. Застосуйте конфігурацію `terraform apply`.
-4. Розкоментуйте бекенд та виконайте `terraform init -reconfigure`.
-
-## Приклад Aurora Cluster
-![rds](./assets/rds.png)
-![rds-cluster](./assets/rds-cluster.png)

@@ -1,6 +1,7 @@
-github_token  = <github_token>
-github_username  = <github_username>
+github_pat  = <github token>
+github_user  = <github username>
 github_repo_url = "https://github.com/<repo>.git"
+github_branch = "main"
 
 rds_password = <rds_password>
 rds_username = <rds_username>

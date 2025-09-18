@@ -1,21 +1,13 @@
-FROM python:3.10-slim
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
+FROM python:3.13-alpine
+RUN apk add --no-cache curl
 WORKDIR /app
-
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
 ENV POSTGRES_HOST=${POSTGRES_HOST}
 ENV POSTGRES_PORT=${POSTGRES_PORT}
 ENV POSTGRES_NAME=${POSTGRES_NAME}
 ENV POSTGRES_USER=${POSTGRES_USER}
 ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-
-COPY goit .
-
-EXPOSE 8000
-
+COPY . .
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+EXPOSE 8000

@@ -17,6 +17,7 @@ resource "aws_iam_role" "eks" {
     ]
   })
 }
+
 # Прив'язка IAM-ролі до політики AmazonEKSClusterPolicy
 resource "aws_iam_role_policy_attachment" "eks" {
   # ARN політики, що надає дозволи для EKS-кластера
@@ -29,15 +30,16 @@ resource "aws_iam_role_policy_attachment" "eks" {
 # Створення EKS-кластера
 resource "aws_eks_cluster" "eks" {
   # Назва кластера
-  name     = var.cluster_name
+  name = var.cluster_name
+
   # ARN IAM-ролі, яка потрібна для керування кластером
   role_arn = aws_iam_role.eks.arn
 
   # Налаштування мережі (VPC)
   vpc_config {
-    endpoint_private_access = true   # Включає приватний доступ до API-сервера
-    endpoint_public_access  = true   # Включає публічний доступ до API-сервера
-    subnet_ids = var.subnet_ids      # Список підмереж, де буде працювати EKS
+    endpoint_private_access = true                # Включає приватний доступ до API-сервера
+    endpoint_public_access  = true                # Включає публічний доступ до API-сервера
+    subnet_ids              = var.subnet_ids      # Список підмереж, де буде працювати EKS
   }
 
   # Налаштування доступу до EKS-кластера
