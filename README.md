@@ -1,15 +1,55 @@
-# Домашнє завдання до теми «Вивчення Agro CD + CD»
+# Фінальний проєкт
 
-## Опис завдання
+## Технічні вимоги
 
-Ваша мета — реалізувати повний CI/CD-процес із використанням Jenkins + Helm + Terraform + Argo CD, який:
-
-1. Автоматично збирає Docker-образ для Django-застосунку;
-2. Публікує образ в Amazon ECR;
-3. Оновлює Helm chart у репозиторії з правильним тегом;
-4. Синхронізує застосунок у кластері через Argo CD, який підхоплює зміни з Git.
-
+- **Інфраструктура**: AWS з використанням Terraform
+- **Компоненти**: VPC, EKS, RDS, ECR, Jenkins, Argo CD, Prometheus, Grafana
 ---
+
+
+## Етапи виконання
+
+1. **Підготовка середовища**:
+
+- Ініціалізувати Terraform.
+- Перевірити всі необхідні змінні та параметри.
+
+
+2. **Розгортання інфраструктури**:
+
+- Виконати команду розгортання:
+```
+terraform apply
+```
+
+- Перевірити стан ресурсів через:
+```
+kubectl get all -n jenkins
+kubectl get all -n argocd
+kubectl get all -n monitoring
+```
+
+3. **Перевірка доступності**:
+
+- Jenkins:
+```
+kubectl port-forward svc/jenkins 8080:8080 -n jenkins
+```
+
+- Argo CD:
+```
+kubectl port-forward svc/argocd-server 8081:443 -n argocd
+```
+
+4. **Моніторинг та перевірка метрик**:
+
+- Grafana:
+```
+kubectl port-forward svc/grafana 3000:80 -n monitoring
+```
+
+- Перевірити стан метрик в Grafana Dashboard.
+
 
 ## Структура проєкту
 
@@ -42,26 +82,33 @@
 │   │   ├── variables.tf     # Змінні модуля
 │   │   └── outputs.tf       # Параметри кластера
 │   │
-│   ├── argo_cd/             # Модуль для Helm-установки Argo CD
-│   │   ├── jenkins.tf       # Helm release для Jenkins
-│   │   ├── variables.tf     # Змінні (версія чарта, namespace, repo URL тощо)
-│   │   ├── providers.tf     # Kubernetes+Helm.  переносимо з модуля jenkins
-│   │   ├── values.yaml      # Кастомна конфігурація Argo CD
-│   │   ├── outputs.tf       # Виводи (hostname, initial admin password)
-│   │   └──charts/                  # Helm-чарт для створення app'ів
-│   │       ├── Chart.yaml
-│   │       ├── values.yaml          # Список applications, repositories
-│   │       └── templates/
-│   │           ├── application.yaml
-│   │           └── repository.yaml
+│   ├── rds/                 # Модуль для RDS
+│   │   ├── rds.tf           # Створення RDS бази даних  
+│   │   ├── aurora.tf        # Створення aurora кластера бази даних  
+│   │   ├── shared.tf        # Спільні ресурси  
+│   │   ├── variables.tf     # Змінні (ресурси, креденшели, values)
+│   │   └── outputs.tf  
 │   │
-│   └── jenkins/             # Модуль для Helm-установки Jenkins
-│       ├── jenkins.tf       # Helm release для Jenkins
-│       ├── variables.tf     # Змінні (ресурси, креденшели, values)
-│       ├── values.yaml      # Конфігурація jenkins
-│       └── outputs.tf       # Виводи (URL, пароль адміністратора)
+│   ├── jenkins/             # Модуль для Helm-установки Jenkins
+│   │   ├── jenkins.tf       # Helm release для Jenkins
+│   │   ├── variables.tf     # Змінні (ресурси, креденшели, values)
+│   │   ├── values.yaml      # Конфігурація jenkins
+│   │   └── outputs.tf       # Виводи (URL, пароль адміністратора)
+│   │
+│   └── argo_cd/             # Модуль для Helm-установки Argo CD
+│      ├── jenkins.tf       # Helm release для Jenkins
+│      ├── variables.tf     # Змінні (версія чарта, namespace, repo URL тощо)
+│      ├── providers.tf     # Kubernetes+Helm.  переносимо з модуля jenkins
+│      ├── values.yaml      # Кастомна конфігурація Argo CD
+│      ├── outputs.tf       # Виводи (hostname, initial admin password)
+│      └──charts/                  # Helm-чарт для створення app'ів
+│         ├── Chart.yaml
+│         ├── values.yaml          # Список applications, repositories
+│         └── templates/
+│             ├── application.yaml
+│             └── repository.yaml
 │
-├── charts/                  # Helm-чарти
+├── charts/                        # Helm-чарти
 │   └── django-app/
 │       ├── templates/
 │       │   ├── deployment.yaml    # Deployment для Django-застосунку
@@ -71,168 +118,92 @@
 │       ├── Chart.yaml             # Метадані чарта
 │       └── values.yaml            # Конфігураційні значення (ConfigMap зі змінними середовища)
 │ 
+├──django
+│ 	├── goit\
+│ 	├── Dockerfile
+│ 	├── Jenkinsfile
+│ 	└── docker-compose.yaml
+│ 
 └── README.md                # Документація проєкту
 ```
 
-## Кроки виконання завдання
-
-1. Jenkins + Helm + Terraform
-
-- Встановіть Jenkins через Helm, автоматизувавши встановлення через Terraform.
-- Забезпечте роботу Jenkins через Kubernetes Agent (Kaniko + Git).
-- Реалізуйте pipeline (через Jenkinsfile), який:
-- Збирає образ із Dockerfile;
-- Пушить його до ECR;
-- Оновлює тег у values.yaml іншого репозиторію;
-- Пушить зміни в main.
-
-2. Argo CD + Helm + Terraform
-
-- Встановіть Argo CD через Helm із використанням Terraform.
-- Налаштуйте Argo CD Application, який стежить за оновленням Helm-чарта.
-- Argo CD має автоматично синхронізувати зміни у кластері після оновлення Git.
+## Необхідні умови
+- `AWS CLI` встановлено та налаштовано
+- `kubectl` встановлено
+- `Helm` встановлено
+- `Docker` встановлено
+- `Terraform` встановлено
 
 
 ## Налаштування змінних
-Створіть файл `terraform.tfvars` з наступними змінними:
+У корні проєкту створіть файл `terraform.tfvars` з наступними змінними:
 
 ```
-github_token  = <your github token>
-github_username  = <your github username>
+github_pat  = <github token>
+github_user  = <github username>
 github_repo_url = "https://github.com/<repo>.git"
+github_branch = "main"
+
+rds_password = <rds_password>
+rds_username = <rds_username>
+rds_database_name = <rds_database_name>
+rds_publicly_accessible = true
+
+# true → створюється Aurora Cluster + writer
+# false → створюється одна aws_db_instance
+rds_use_aurora = true
+rds_multi_az = false
+rds_backup_retention_period = "0"
 ```
 
-Можете використати `terraform.tfvars.example` як приклад.
+Або можете використати `terraform.tfvars.example` як приклад.
 
-## Команди для ініціалізації, запуску та видалення
+## Налаштування середовища
+`region` за замовченням `us-east-1`
 
-```bash
-# Ініціалізація
+```
 terraform init
-
-# Перегляд змін інфраструктури
 terraform plan
-
-# Застосування інфраструктури
 terraform apply
-
-# Видалення інфраструктури
-terraform destroy
 ```
 
 ## Налаштування kubectl
 
 ```bash
 # Підключення до EKS-кластеру
-aws eks update-kubeconfig --region us-east-1 --name [EKS_CLUSTER_NAME]
+aws eks update-kubeconfig --region us-east-1 --name <your_cluster_name>
 
 # Перевірка доступу
 kubectl get nodes
+
+# або перевірка сервісів в кластері:
+kubectl get svc -A
 ```
+![bash](./assets/bash.png)
 
-## Завантаження Docker-образу на новостворений ECR-репозиторій
+Відкрийте Jenkins LoadBalancer URL (username: admin; password: admin123)
+- запустіть `seed-job` задачу (це створить нову задачу `django-docker`)
+- запустіть `django-docker` задачу:
+  - Збере та завантажить образ Docker до ECR
+  - Об'єднає MR у вашому репозиторії з оновленням версії програми (відповідно до номера збірки завдання Jenkins `django-docker`)
 
-```bash
-# Перехід у папку з Django-проєктом
-cd docker/django
+![jenkins](./assets/jenkins.png)
 
-# Збірка образу без кешу
-docker build --no-cache -t django-app .
+Відкрити Argo CD LoadBalancer URL,
+ Використовуйте логін admin, а щоб отримати пароль виконайте наступну команду `kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath={.data.password} | base64 -d`
+- перевірити статус `example-app` застосунку (має бути `Healthy` та `Synced`)
 
-# Логін у ECR
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin [ACCOUNT_ID].dkr.ecr.us-east-1.amazonaws.com
+![argocd](./assets/argocd.png)
 
-# Тегування
-docker tag django-app:latest [ACCOUNT_ID].dkr.ecr.us-east-1.amazonaws.com/django-app:latest
+## Моніторинг
+- перенаправити порт Grafana за допомогою наступної команди `kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:80`
+- відкрити http://localhost:3000
+- ввести імʼя користувача `admin` та пароль, використавши наступну команду `kubectl get secret --namespace monitoring kube-prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 --decode`
+- перевірте панелі інструментів, щоб побачити використання процесора та пам'яті (POD, вузли тощо)
 
-# Завантаження
-docker push [ACCOUNT_ID].dkr.ecr.us-east-1.amazonaws.com/django-app:latest
+![grafana](./assets/grafana.png)
 
-# Повернення до кореневої директорії проєкту
-cd ../..
-```
-
-## Застосування Helm:
-
-```bash
-cd charts/django-app
-helm install django-app .
-```
-
-where `django-app` is your helm chart name.
-
-## Видалення ресурсів:
-
-Kubernetes (PODs, Services, Deployments etc.)
-```bash
-helm uninstall django-app
-```
-
-where `django-app` is your helm chart name.
-
-Terraform (EKS, VPC, ECR etc.)
-
+## Видалення ресурсів
 ```bash
 terraform destroy
 ```
-
-## Додаткова інформація:
-
-Якщо ви хочете оновити helm chart:
-
-```bash
-helm upgrade django-app .
-```
-
-Якщо ви хочете оновити terraform:
-
-```bash
-terraform init -upgrade
-terraform plan
-terraform apply
-```
-
-### Доступ до Jenkins
-
-```bash
-# Jenkins URL
-kubectl get services -n jenkins
-
-# Отримати початковий пароль Jenkins
-kubectl exec --namespace jenkins -it svc/jenkins -c jenkins -- /bin/cat /run/secrets/additional/chart-admin-password && echo
-
-# Чи вже налаштований пароль: admin123
-```
-
-### Доступ до Argo CD
-```
-# Отримати Argo CD URL
-kubectl get services -n argocd
-
-# Отримати початковий пароль для admin
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-```
-
-### Налаштування віддаленого бекенду
-
-Після початкового розгортання для активації віддаленого бекенду:
-
-1. Розкоментуйте блок конфігурації бекенду в `backend.tf`.
-
-2. Виконайте команду `terraform init` з параметром для повторного підключення бекенду:
-
-```bash
-terraform init -reconfigure
-```
-
-### Відновлення
-1. Закоментуйте конфігурацію бекенду в `backend.tf`.
-2. Виконайте `terraform init`.
-3. Застосуйте конфігурацію `terraform apply`.
-4. Розкоментуйте бекенд та виконайте `terraform init -reconfigure`.
----
-
-![jenkins](./assets/jenkins.png)
-![jenkins-dashboard](./assets/jenkins-dashboard.png)
-![cluster](./assets/cluster.png)
-![ecr](./assets/ecr.png)

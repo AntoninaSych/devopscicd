@@ -1,11 +1,13 @@
+# Required
 variable "repository_name" {
-  description = "Назва репозиторію ECR"
   type        = string
+  description = "Назва ECR репозиторію (унікальна в акаунті та регіоні)."
 }
 
+# Optional
 variable "scan_on_push" {
-  description = "Увімкнути сканування зображень під час пушу"
   type        = bool
+  description = "Чи сканувати образи на вразливості одразу після push."
   default     = true
 }
 
